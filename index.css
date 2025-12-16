@@ -229,7 +229,7 @@
         
         .menu-subtitle {
             font-size: 0.9rem;
-            opacity: 0.9;
+            opacity: 1;
         }
         
         .menu-icon {
@@ -479,4 +479,5 @@
             .menu-scroll {
                 display: block;
             }
+
         }
