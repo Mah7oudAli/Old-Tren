@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Old-Tren | قائمة الطعام</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Meta Description للSEO -->
+    <meta name="description" content="Old-Tren مطعم وكافيتريا مميز في درعا المحطة، شارع الشهداء مقابل الحجاز مول. نقدم أشهى المأكولات والمشروبات بجودة عالية في أجواء تقليدية عصرية. تفضلوا بزيارتنا لتجربة طعم لا يقاوم!">
+    <meta name="keywords" content="Old-Tren, مطعم, كافيتريا, درعا المحطة, شارع الشهداء, الحجاز مول, قائمة الطعام, منيو, وجبات, مشروبات, عصائر, بوظة, مشويات">
+    <meta name="author" content="Old-Tren">
+    <!-- Open Graph للشبكات الاجتماعية -->
+    <meta property="og:title" content="Old-Tren | مطعم وكافيتريا">
+    <meta property="og:description" content="مطعم وكافيتريا في درعا المحطة، شارع الشهداء مقابل الحجاز مول. نقدم أشهى المأكولات والمشروبات">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- شاشة البدء -->
+    <div id="splash-screen">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fas fa-utensils"></i>
+            </div>
+            <div class="logo-text">Old-Tren</div>
+            <div class="logo-subtitle">مطعم وكافيتريا</div>
+        </div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- نافذة تكبير الصورة -->
+    <div class="image-modal" id="imageModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <img class="modal-img" id="modalImg" src="" alt="صورة القائمة">
+            <div class="menu-text-overlay" id="modalText">
+                <!-- سيتم إضافة النص هنا ديناميكياً -->
+            </div>
+            <div class="modal-nav modal-prev" id="prevModal">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="modal-nav modal-next" id="nextModal">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- الهيدر -->
+    <header>
+        <div class="header-container">
+            <div class="header-logo">
+                <i class="fas fa-utensils"></i>
+                <h1>Old-Tren | المنيو</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- شريط القوائم -->
+    <div class="categories-bar" id="categoriesBar">
+        <!-- سيتم إضافة الأزرار ديناميكياً -->
+    </div>
+
+    <!-- تلميح السحب -->
+    <div class="swipe-hint">
+        <i class="fas fa-arrow-left"></i>
+    </div>
+
+    <!-- حاوية الصور -->
+    <div class="menu-container">
+        <div class="menu-scroll" id="menuScroll">
+            <!-- سيتم إضافة الصور ديناميكياً -->
+        </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer id="footer">
+        <div class="copyright">
+            <p>جميع الحقوق محفوظة &copy; 2023 Old-Tren مطعم وكافيتريا</p>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات القوائم مع محتويات كل قائمة
+        const menuCategories = [
+            {
+                id: "main",
+                name: "الرئيسية",
+                image: "images/index.jpg",
+                subtitle: "أفضل ما نقدمه",
+                content: "القائمة الرئيسية\nوجبة شاورما عربي\nوجبة فاصيلنا\nوجبة سكالوب\nوجبة مكسيكي\nوجبة زنجر\nوجبة كرسبي\nوجبة شيش\nبروسند"
+            },
+            {
+                id: "juices",
+                name: "عصائر",
+                image: "images/drank.jpg",
+                subtitle: "طازجة وطبيعية",
+                content: "عصير برتقال طازج\nعصير فراولة\nعصير مانجو\nعصير أناناس\nسموذي موز\nسموذي توت\nعصير جزر\nعصير تفاح"
+            },
+            {
+                id: "icecream",
+                name: "بوظة",
+                image: "images/ice.jpg",
+                subtitle: "بأشهى النكهات",
+                content: "بوظة شوكولاتة\nبوظة فانيلا\nبوظة فراولة\nبوظة مانجو\nبوظة ليمون\nبوظة قهوة\nبوظة كراميل\nبوظة بندق"
+            },
+            {
+                id: "meals",
+                name: "وجبات",
+                image: "images/food-groub.jpg",
+                subtitle: "شهية ومتنوعة",
+                content: "وجبة ستيك لحم\nوجبة دجاج مشوي\nوجبة سمك مشوي\nوجبة معكرونة\nوجبة بيتزا\nوجبة برجر\nوجبة رز بخاري\nوجبة كبسة"
+            },
+            {
+                id: "cocktails",
+                name: "كوكتيل",
+                image: "images/cocktails.jpg",
+                subtitle: "مشروبات منعشة",
+                content: "كوكتيل فراولة\nكوكتيل مانجو\nكوكتيل أناناس\nكوكتيل موز\nكوكتيل توت\nكوكتيل كيوي\nكوكتيل برتقال\nكوكتيل ليمون"
+            },
+            {
+                id: "sandwiches",
+                name: "سندويشات",
+                image: "images/sandwiches.jpg",
+                subtitle: "لذيذة وسريعة",
+                content: "سندويش شاورما دجاج\nسندويش شاورما لحم\nسندويش برجر\nسندويش فلافل\nسندويش جبنة\nسندويش هوت دوج\nسندويش صاج\nسندويش كباب"
+            },
+            {
+                id: "salad",
+                name: "السلطة",
+                image: "images/salat.jpg",
+                subtitle: "طازجة وصحية",
+                content: "سلطة سيزر\nسلطة يونانية\nسلطة خضراء\nسلطة فواكه\nسلطة تابولي\nسلطة بطاطس\nسلطة كول سلو\nسلطة ذرة"
+            },
+            {
+                id: "kingshak",
+                name: "الملك شك",
+                image: "images/kingshak.jpg",
+                subtitle: "حلويات مميزة",
+                content: "كيك شوكولاتة\nكيك جبن\nكيك فواكه\nتشيز كيك\ndoughnut\nوافل\nبان كيك\nكوكيز"
+            },
+            {
+                id: "appetizers",
+                name: "المقبلات",
+                image: "images/appetizers.jpg",
+                subtitle: "مقبلات لبداية الوجبة",
+                content: "بطاطس مقلية\nحلقات بصل\nأصابع الجبن\nسمبوسة\nكبة\nنقانق\nمقبلات مشكلة\nمخللات"
+            },
+            {
+                id: "hotdrinks",
+                name: "مشروبات ساخنة",
+                image: "images/hotdrinks.jpg",
+                subtitle: "تدفئة واسترخاء",
+                content: "قهوة عربية\nقهوة تركية\nشاي\nشاي أخضر\nكابتشينو\nلاتيه\nموكا\nشوكولاتة ساخنة"
+            },
+            {
+                id: "grills",
+                name: "مشويات",
+                image: "images/grills.jpg",
+                subtitle: "طازجة على الفحم",
+                content: "شيش طاووق\nكفتة مشوية\nلحم مشوي\nدجاج مشوي\nسمك مشوي\nربيان مشوي\nخضار مشوية\nمشويات مشكلة"
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const splashScreen = document.getElementById('splash-screen');
+            const menuScroll = document.getElementById('menuScroll');
+            const categoriesBar = document.getElementById('categoriesBar');
+            const swipeHint = document.querySelector('.swipe-hint');
+            const imageModal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const modalText = document.getElementById('modalText');
+            const closeModal = document.getElementById('closeModal');
+            const prevModal = document.getElementById('prevModal');
+            const nextModal = document.getElementById('nextModal');
+            
+            let currentImageIndex = 0;
+            
+            // إخفاء شاشة البدء
+            setTimeout(() => {
+                splashScreen.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 500);
+            }, 3000);
+            
+            // تحميل الصور
+            loadMenuCategories();
+            
+            // إضافة أزرار القوائم
+            loadCategoryButtons();
+            
+            // أحداث السحب
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            menuScroll.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            menuScroll.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            // إخفاء تلميح السحب بعد 5 ثوان
+            setTimeout(() => {
+                swipeHint.style.opacity = '0';
+                setTimeout(() => {
+                    swipeHint.style.display = 'none';
+                }, 500);
+            }, 5000);
+            
+            // إغلاق نافذة الصورة
+            closeModal.addEventListener('click', function() {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // التنقل بين الصور في نافذة التكبير
+            prevModal.addEventListener('click', function() {
+                navigateModal('prev');
+            });
+            
+            nextModal.addEventListener('click', function() {
+                navigateModal('next');
+            });
+            
+            // إغلاق النافذة بالضغط على الخلفية
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    imageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+            
+            // إغلاق النافذة بمفتاح Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && imageModal.classList.contains('active')) {
+                    imageModal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+                
+                // التنقل بين الصور بالسهمين
+                if (imageModal.classList.contains('active')) {
+                    if (e.key === 'ArrowRight') {
+                        navigateModal('prev');
+                    } else if (e.key === 'ArrowLeft') {
+                        navigateModal('next');
+                    }
+                }
+            });
+            
+            // تحميل الصور
+            function loadMenuCategories() {
+                menuScroll.innerHTML = '';
+                
+                menuCategories.forEach((category, index) => {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'menu-img-container';
+                    imgContainer.id = category.id; // إضافة ID مطابق لزر القائمة
+                    imgContainer.setAttribute('data-index', index);
+                    
+                    imgContainer.innerHTML = `
+                        <img src="${category.image}" alt="${category.name}" class="menu-img">
+                        <div class="menu-img-overlay">
+                            <div>
+                                <div class="menu-title">${category.name}</div>
+                                <div class="menu-subtitle">${category.subtitle}</div>
+                            </div>
+                            <div class="menu-icon">
+                                <i class="fas fa-expand-alt"></i>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // حدث النقر على الصورة لفتحها بتكبير
+                    imgContainer.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        openImageModal(index);
+                    });
+                    
+                    menuScroll.appendChild(imgContainer);
+                });
+            }
+            
+            // تحميل أزرار القوائم
+            function loadCategoryButtons() {
+                categoriesBar.innerHTML = '';
+                
+                menuCategories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.className = 'category-btn';
+                    button.setAttribute('data-category', category.id);
+                    button.textContent = category.name;
+                    
+                    button.addEventListener('click', function() {
+                        // إزالة النشط من جميع الأزرار
+                        document.querySelectorAll('.category-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        
+                        // إضافة النشط للزر المحدد
+                        this.classList.add('active');
+                        
+                        // الحصول على معرف القائمة
+                        const categoryId = this.getAttribute('data-category');
+                        
+                        // البحث عن العنصر بالـ ID المطابق
+                        const targetElement = document.getElementById(categoryId);
+                        
+                        if (targetElement) {
+                            // التمرير إلى العنصر
+                            targetElement.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start' 
+                            });
+                            
+                            // إضافة تأثير بسيط
+                            targetElement.style.transform = 'scale(1.02)';
+                            targetElement.style.transition = 'transform 0.3s ease';
+                            
+                            setTimeout(() => {
+                                targetElement.style.transform = 'scale(1)';
+                            }, 300);
+                        }
+                    });
+                    
+                    categoriesBar.appendChild(button);
+                });
+                
+                // تفعيل الزر الأول
+                if (categoriesBar.firstChild) {
+                    categoriesBar.firstChild.classList.add('active');
+                }
+            }
+            
+            // فتح نافذة الصورة
+            function openImageModal(index) {
+                currentImageIndex = index;
+                const category = menuCategories[index];
+                
+                // عرض الصورة
+                modalImg.src = category.image;
+                modalImg.alt = category.name;
+                
+                // عرض المحتوى النصي (إذا كان موجوداً)
+                let contentHTML = `<strong>${category.name}</strong>`;
+                if (category.content && category.content.trim() !== '') {
+                    const formattedContent = category.content.replace(/\n/g, '<br>');
+                    contentHTML += `<br>${formattedContent}`;
+                } else {
+                    contentHTML += `<br>${category.subtitle}`;
+                }
+                modalText.innerHTML = contentHTML;
+                
+                // عرض النافذة
+                imageModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // تحديث زر القائمة النشط
+                updateCategoryButtons(category.id);
+            }
+            
+            // التنقل بين الصور في نافذة التكبير
+            function navigateModal(direction) {
+                if (direction === 'prev') {
+                    currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : menuCategories.length - 1;
+                } else {
+                    currentImageIndex = currentImageIndex < menuCategories.length - 1 ? currentImageIndex + 1 : 0;
+                }
+                
+                const category = menuCategories[currentImageIndex];
+                
+                // تحديث الصورة والمحتوى
+                modalImg.src = category.image;
+                modalImg.alt = category.name;
+                
+                // عرض المحتوى النصي (إذا كان موجوداً)
+                let contentHTML = `<strong>${category.name}</strong>`;
+                if (category.content && category.content.trim() !== '') {
+                    const formattedContent = category.content.replace(/\n/g, '<br>');
+                    contentHTML += `<br>${formattedContent}`;
+                } else {
+                    contentHTML += `<br>${category.subtitle}`;
+                }
+                modalText.innerHTML = contentHTML;
+                
+                // تحديث شريط القوائم
+                updateCategoryButtons(category.id);
+                
+                // التمرير إلى الصورة المحددة
+                scrollToCategory(category.id);
+            }
+            
+            // تحديث أزرار القوائم
+            function updateCategoryButtons(categoryId) {
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-category') === categoryId) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // التمرير إلى تصنيف معين
+            function scrollToCategory(categoryId) {
+                const categoryElement = document.getElementById(categoryId);
+                if (categoryElement) {
+                    categoryElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                }
+            }
+            
+            // معالجة السحب
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                
+                if (touchEndX < touchStartX - swipeThreshold) {
+                    // سحب لليسار - التالي
+                    navigateSwipe('next');
+                } else if (touchEndX > touchStartX + swipeThreshold) {
+                    // سحب لليمين - السابق
+                    navigateSwipe('prev');
+                }
+            }
+            
+            // التنقل بالسحب
+            function navigateSwipe(direction) {
+                const activeBtn = document.querySelector('.category-btn.active');
+                let nextCategoryId;
+                
+                if (direction === 'next') {
+                    if (activeBtn && activeBtn.nextElementSibling) {
+                        nextCategoryId = activeBtn.nextElementSibling.getAttribute('data-category');
+                    } else {
+                        nextCategoryId = document.querySelector('.category-btn').getAttribute('data-category');
+                    }
+                } else {
+                    if (activeBtn && activeBtn.previousElementSibling) {
+                        nextCategoryId = activeBtn.previousElementSibling.getAttribute('data-category');
+                    } else {
+                        const lastBtn = document.querySelector('.category-btn:last-child');
+                        nextCategoryId = lastBtn.getAttribute('data-category');
+                    }
+                }
+                
+                scrollToCategory(nextCategoryId);
+                updateCategoryButtons(nextCategoryId);
+            }
+        });
+    </script>
+</body>
+</html>
