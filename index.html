@@ -87,336 +87,407 @@
 
     <script>
         // بيانات القوائم بدون subtitle و content بالترتيب المطلوب
-        const menuCategories = [
-            {
-                id: "meals",
-                name: "وجبات",
-                image: "images/food-groub.jpg"
-            },
-            {
-                id: "grills",
-                name: "مشويات",
-                image: "images/grills.jpg"
-            },
-            {
-                id: "sandwiches",
-                name: "سندويشات",
-                image: "images/sandwiches.jpg"
-            },
-            {
-                id: "appetizers",
-                name: "مقبلات",
-                image: "images/appetizers.jpg"
-            },
-            {
-                id: "salad",
-                name: "سلطات",
-                image: "images/salat.jpg"
-            },
-            {
-                id: "icecream",
-                name: "بوظة",
-                image: "images/ice.jpg"
-            },
-            {
-                id: "milkshake",
-                name: "ميلك شيك",
-                image: "images/kingshak.jpg"
-            },
-            {
-                id: "cocktails",
-                name: "كوكتيلات",
-                image: "images/cocktails.jpg"
-            },
-            {
-                id: "juices",
-                name: "عصائر",
-                image: "images/drank.jpg"
-            },
-            {
-                id: "hotdrinks",
-                name: "مشروبات ساخنة",
-                image: "images/hotdrinks.jpg"
-            }
-        ];
+        // بيانات القوائم بدون subtitle و content بالترتيب المطلوب
+const menuCategories = [
+    {
+        id: "meals",
+        name: "وجبات",
+        image: "images/food-groub.jpg"
+    },
+    {
+        id: "grills",
+        name: "مشويات",
+        image: "images/grills.jpg"
+    },
+    {
+        id: "sandwiches",
+        name: "سندويشات",
+        image: "images/sandwiches.jpg"
+    },
+    {
+        id: "appetizers",
+        name: "مقبلات",
+        image: "images/appetizers.jpg"
+    },
+    {
+        id: "salad",
+        name: "سلطات",
+        image: "images/salat.jpg"
+    },
+    {
+        id: "icecream",
+        name: "بوظة",
+        image: "images/ice.jpg"
+    },
+    {
+        id: "milkshake",
+        name: "ميلك شيك",
+        image: "images/kingshak.jpg"
+    },
+    {
+        id: "cocktails",
+        name: "كوكتيلات",
+        image: "images/cocktails.jpg"
+    },
+    {
+        id: "juices",
+        name: "عصائر",
+        image: "images/drank.jpg"
+    },
+    {
+        id: "hotdrinks",
+        name: "مشروبات ساخنة",
+        image: "images/hotdrinks.jpg"
+    }
+];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const splashScreen = document.getElementById('splash-screen');
-            const menuScroll = document.getElementById('menuScroll');
-            const categoriesBar = document.getElementById('categoriesBar');
-            const swipeHint = document.querySelector('.swipe-hint');
-            const imageModal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImg');
-            const modalText = document.getElementById('modalText');
-            const closeModal = document.getElementById('closeModal');
-            const prevModal = document.getElementById('prevModal');
-            const nextModal = document.getElementById('nextModal');
-            
-            let currentImageIndex = 0;
-            
-            // إخفاء شاشة البدء
-            setTimeout(() => {
-                splashScreen.classList.add('fade-out');
-                
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                }, 500);
-            }, 3000);
-            
-            // تحميل الصور
-            loadMenuCategories();
-            
-            // إضافة أزرار القوائم
-            loadCategoryButtons();
-            
-            // أحداث السحب
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            menuScroll.addEventListener('touchstart', function(e) {
-                touchStartX = e.changedTouches[0].screenX;
-            });
-            
-            menuScroll.addEventListener('touchend', function(e) {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            });
-            
-            // إخفاء تلميح السحب بعد 5 ثوان
-            setTimeout(() => {
-                swipeHint.style.opacity = '0';
-                setTimeout(() => {
-                    swipeHint.style.display = 'none';
-                }, 500);
-            }, 5000);
-            
-            // إغلاق نافذة الصورة
-            closeModal.addEventListener('click', function() {
-                imageModal.classList.remove('active');
-                document.body.style.overflow = 'auto';
-            });
-            
-            // التنقل بين الصور في نافذة التكبير
-            prevModal.addEventListener('click', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    const splashScreen = document.getElementById('splash-screen');
+    const menuScroll = document.getElementById('menuScroll');
+    const categoriesBar = document.getElementById('categoriesBar');
+    const swipeHint = document.querySelector('.swipe-hint');
+    const imageModal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImg');
+    const modalText = document.getElementById('modalText');
+    const closeModal = document.getElementById('closeModal');
+    const prevModal = document.getElementById('prevModal');
+    const nextModal = document.getElementById('nextModal');
+    
+    let currentImageIndex = 0;
+    let currentActiveIndex = 0;
+    
+    // إخفاء شاشة البدء
+    setTimeout(() => {
+        splashScreen.classList.add('fade-out');
+        
+        setTimeout(() => {
+            splashScreen.style.display = 'none';
+            // عرض أول صورة بعد إخفاء شاشة البدء
+            showActiveImage();
+        }, 500);
+    }, 3000);
+    
+    // تحميل الصور
+    loadMenuCategories();
+    
+    // إضافة أزرار القوائم
+    loadCategoryButtons();
+    
+    // إضافة أسهم التنقل
+    addNavigationArrows();
+    
+    // إضافة مؤشر الصور
+    addImageIndicator();
+    
+    // أحداث السحب
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    menuScroll.addEventListener('touchstart', function(e) {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    menuScroll.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+    
+    // إخفاء تلميح السحب بعد 5 ثوان
+    setTimeout(() => {
+        swipeHint.style.opacity = '0';
+        setTimeout(() => {
+            swipeHint.style.display = 'none';
+        }, 500);
+    }, 5000);
+    
+    // إغلاق نافذة الصورة
+    closeModal.addEventListener('click', function() {
+        imageModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+    
+    // التنقل بين الصور في نافذة التكبير
+    prevModal.addEventListener('click', function() {
+        navigateModal('prev');
+    });
+    
+    nextModal.addEventListener('click', function() {
+        navigateModal('next');
+    });
+    
+    // إغلاق النافذة بالضغط على الخلفية
+    imageModal.addEventListener('click', function(e) {
+        if (e.target === imageModal) {
+            imageModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    });
+    
+    // إغلاق النافذة بمفتاح Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && imageModal.classList.contains('active')) {
+            imageModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // التنقل بين الصور بالسهمين
+        if (imageModal.classList.contains('active')) {
+            if (e.key === 'ArrowRight') {
                 navigateModal('prev');
-            });
-            
-            nextModal.addEventListener('click', function() {
+            } else if (e.key === 'ArrowLeft') {
                 navigateModal('next');
+            }
+        }
+        
+        // التنقل بين الصور الرئيسية بالسهمين
+        if (!imageModal.classList.contains('active')) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                navigateImage('next');
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                navigateImage('prev');
+            }
+        }
+    });
+    
+    // تحميل الصور
+    function loadMenuCategories() {
+        menuScroll.innerHTML = '';
+        
+        menuCategories.forEach((category, index) => {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'menu-img-container';
+            imgContainer.id = category.id;
+            imgContainer.setAttribute('data-index', index);
+            
+            imgContainer.innerHTML = `
+                <img src="${category.image}" alt="${category.name}" class="menu-img">
+                <div class="menu-img-overlay">
+                    <div>
+                        <div class="menu-title">${category.name}</div>
+                    </div>
+                    <div class="menu-icon">
+                        <i class="fas fa-expand-alt"></i>
+                    </div>
+                </div>
+            `;
+            
+            // حدث النقر على الصورة لفتحها بتكبير
+            imgContainer.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                openImageModal(index);
             });
             
-            // إغلاق النافذة بالضغط على الخلفية
-            imageModal.addEventListener('click', function(e) {
-                if (e.target === imageModal) {
-                    imageModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
+            menuScroll.appendChild(imgContainer);
+        });
+    }
+    
+    // إضافة أسهم التنقل
+    function addNavigationArrows() {
+        const arrowsContainer = document.createElement('div');
+        arrowsContainer.className = 'navigation-arrows';
+        
+        arrowsContainer.innerHTML = `
+            <button class="nav-arrow prev">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="nav-arrow next">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        `;
+        
+        document.body.appendChild(arrowsContainer);
+        
+        // أحداث الأسهم
+        document.querySelector('.nav-arrow.prev').addEventListener('click', function() {
+            navigateImage('prev');
+        });
+        
+        document.querySelector('.nav-arrow.next').addEventListener('click', function() {
+            navigateImage('next');
+        });
+    }
+    
+    // إضافة مؤشر الصور
+    function addImageIndicator() {
+        const indicator = document.createElement('div');
+        indicator.className = 'image-indicator';
+        indicator.id = 'imageIndicator';
+        
+        menuCategories.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'indicator-dot';
+            if (index === 0) dot.classList.add('active');
+            dot.setAttribute('data-index', index);
+            
+            dot.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                navigateToImage(index);
             });
             
-            // إغلاق النافذة بمفتاح Escape
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && imageModal.classList.contains('active')) {
-                    imageModal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                }
-                
-                // التنقل بين الصور بالسهمين
-                if (imageModal.classList.contains('active')) {
-                    if (e.key === 'ArrowRight') {
-                        navigateModal('prev');
-                    } else if (e.key === 'ArrowLeft') {
-                        navigateModal('next');
-                    }
-                }
-            });
+            indicator.appendChild(dot);
+        });
+        
+        document.body.appendChild(indicator);
+    }
+    
+    // عرض الصورة النشطة
+    function showActiveImage() {
+        // إخفاء جميع الصور
+        document.querySelectorAll('.menu-img-container').forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        // إظهار الصورة النشطة
+        const activeContainer = document.querySelector(`[data-index="${currentActiveIndex}"]`);
+        if (activeContainer) {
+            activeContainer.classList.add('active');
             
-            // تحميل الصور
-            function loadMenuCategories() {
-                menuScroll.innerHTML = '';
-                
-                menuCategories.forEach((category, index) => {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'menu-img-container';
-                    imgContainer.id = category.id; // إضافة ID مطابق لزر القائمة
-                    imgContainer.setAttribute('data-index', index);
-                    
-                    imgContainer.innerHTML = `
-                        <img src="${category.image}" alt="${category.name}" class="menu-img">
-                        <div class="menu-img-overlay">
-                            <div>
-                                <div class="menu-title">${category.name}</div>
-                            </div>
-                            <div class="menu-icon">
-                                <i class="fas fa-expand-alt"></i>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // حدث النقر على الصورة لفتحها بتكبير
-                    imgContainer.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        openImageModal(index);
-                    });
-                    
-                    menuScroll.appendChild(imgContainer);
-                });
-            }
-            
-            // تحميل أزرار القوائم
-            function loadCategoryButtons() {
-                categoriesBar.innerHTML = '';
-                
-                menuCategories.forEach(category => {
-                    const button = document.createElement('button');
-                    button.className = 'category-btn';
-                    button.setAttribute('data-category', category.id);
-                    button.textContent = category.name;
-                    
-                    button.addEventListener('click', function() {
-                        // إزالة النشط من جميع الأزرار
-                        document.querySelectorAll('.category-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        
-                        // إضافة النشط للزر المحدد
-                        this.classList.add('active');
-                        
-                        // الحصول على معرف القائمة
-                        const categoryId = this.getAttribute('data-category');
-                        
-                        // البحث عن العنصر بالـ ID المطابق
-                        const targetElement = document.getElementById(categoryId);
-                        
-                        if (targetElement) {
-                            // التمرير إلى العنصر
-                            targetElement.scrollIntoView({ 
-                                behavior: 'smooth', 
-                                block: 'start' 
-                            });
-                            
-                            // إضافة تأثير بسيط
-                            targetElement.style.transform = 'scale(1.02)';
-                            targetElement.style.transition = 'transform 0.3s ease';
-                            
-                            setTimeout(() => {
-                                targetElement.style.transform = 'scale(1)';
-                            }, 300);
-                        }
-                    });
-                    
-                    categoriesBar.appendChild(button);
-                });
-                
-                // تفعيل الزر الأول
-                if (categoriesBar.firstChild) {
-                    categoriesBar.firstChild.classList.add('active');
-                }
-            }
-            
-            // فتح نافذة الصورة
-            function openImageModal(index) {
-                currentImageIndex = index;
-                const category = menuCategories[index];
-                
-                // عرض الصورة
-                modalImg.src = category.image;
-                modalImg.alt = category.name;
-                
-                // عرض اسم القائمة فقط
-                let contentHTML = `<strong>${category.name}</strong>`;
-                modalText.innerHTML = contentHTML;
-                
-                // عرض النافذة
-                imageModal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                
-                // تحديث زر القائمة النشط
-                updateCategoryButtons(category.id);
-            }
-            
-            // التنقل بين الصور في نافذة التكبير
-            function navigateModal(direction) {
-                if (direction === 'prev') {
-                    currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : menuCategories.length - 1;
-                } else {
-                    currentImageIndex = currentImageIndex < menuCategories.length - 1 ? currentImageIndex + 1 : 0;
-                }
-                
-                const category = menuCategories[currentImageIndex];
-                
-                // تحديث الصورة والمحتوى
-                modalImg.src = category.image;
-                modalImg.alt = category.name;
-                
-                // عرض اسم القائمة فقط
-                let contentHTML = `<strong>${category.name}</strong>`;
-                modalText.innerHTML = contentHTML;
-                
-                // تحديث شريط القوائم
-                updateCategoryButtons(category.id);
-                
-                // التمرير إلى الصورة المحددة
-                scrollToCategory(category.id);
-            }
-            
-            // تحديث أزرار القوائم
-            function updateCategoryButtons(categoryId) {
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.getAttribute('data-category') === categoryId) {
-                        btn.classList.add('active');
-                    }
-                });
-            }
-            
-            // التمرير إلى تصنيف معين
-            function scrollToCategory(categoryId) {
-                const categoryElement = document.getElementById(categoryId);
-                if (categoryElement) {
-                    categoryElement.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
-                }
-            }
-            
-            // معالجة السحب
-            function handleSwipe() {
-                const swipeThreshold = 50;
-                
-                if (touchEndX < touchStartX - swipeThreshold) {
-                    // سحب لليسار - التالي
-                    navigateSwipe('next');
-                } else if (touchEndX > touchStartX + swipeThreshold) {
-                    // سحب لليمين - السابق
-                    navigateSwipe('prev');
-                }
-            }
-            
-            // التنقل بالسحب
-            function navigateSwipe(direction) {
-                const activeBtn = document.querySelector('.category-btn.active');
-                let nextCategoryId;
-                
-                if (direction === 'next') {
-                    if (activeBtn && activeBtn.nextElementSibling) {
-                        nextCategoryId = activeBtn.nextElementSibling.getAttribute('data-category');
-                    } else {
-                        nextCategoryId = document.querySelector('.category-btn').getAttribute('data-category');
-                    }
-                } else {
-                    if (activeBtn && activeBtn.previousElementSibling) {
-                        nextCategoryId = activeBtn.previousElementSibling.getAttribute('data-category');
-                    } else {
-                        const lastBtn = document.querySelector('.category-btn:last-child');
-                        nextCategoryId = lastBtn.getAttribute('data-category');
-                    }
-                }
-                
-                scrollToCategory(nextCategoryId);
-                updateCategoryButtons(nextCategoryId);
+            // التمرير إلى الصورة
+            activeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // تحديث زر القائمة النشط
+        updateCategoryButtons(menuCategories[currentActiveIndex].id);
+        
+        // تحديث مؤشر الصور
+        updateImageIndicator();
+    }
+    
+    // التنقل بين الصور
+    function navigateImage(direction) {
+        if (direction === 'prev') {
+            currentActiveIndex = currentActiveIndex > 0 ? currentActiveIndex - 1 : menuCategories.length - 1;
+        } else {
+            currentActiveIndex = currentActiveIndex < menuCategories.length - 1 ? currentActiveIndex + 1 : 0;
+        }
+        
+        showActiveImage();
+    }
+    
+    // التنقل إلى صورة معينة
+    function navigateToImage(index) {
+        if (index >= 0 && index < menuCategories.length) {
+            currentActiveIndex = index;
+            showActiveImage();
+        }
+    }
+    
+    // تحديث مؤشر الصور
+    function updateImageIndicator() {
+        document.querySelectorAll('.indicator-dot').forEach((dot, index) => {
+            dot.classList.remove('active');
+            if (index === currentActiveIndex) {
+                dot.classList.add('active');
             }
         });
+    }
+    
+    // تحميل أزرار القوائم
+    function loadCategoryButtons() {
+        categoriesBar.innerHTML = '';
+        
+        menuCategories.forEach(category => {
+            const button = document.createElement('button');
+            button.className = 'category-btn';
+            button.setAttribute('data-category', category.id);
+            button.textContent = category.name;
+            
+            button.addEventListener('click', function() {
+                // إزالة النشط من جميع الأزرار
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // إضافة النشط للزر المحدد
+                this.classList.add('active');
+                
+                // الحصول على معرف القائمة
+                const categoryId = this.getAttribute('data-category');
+                
+                // البحث عن العنصر بالـ ID المطابق
+                const targetElement = document.getElementById(categoryId);
+                
+                if (targetElement) {
+                    const index = parseInt(targetElement.getAttribute('data-index'));
+                    navigateToImage(index);
+                }
+            });
+            
+            categoriesBar.appendChild(button);
+        });
+        
+        // تفعيل الزر الأول
+        if (categoriesBar.firstChild) {
+            categoriesBar.firstChild.classList.add('active');
+        }
+    }
+    
+    // فتح نافذة الصورة
+    function openImageModal(index) {
+        currentImageIndex = index;
+        const category = menuCategories[index];
+        
+        // عرض الصورة
+        modalImg.src = category.image;
+        modalImg.alt = category.name;
+        
+        // عرض اسم القائمة فقط
+        let contentHTML = `<strong>${category.name}</strong>`;
+        modalText.innerHTML = contentHTML;
+        
+        // عرض النافذة
+        imageModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // تحديث زر القائمة النشط
+        updateCategoryButtons(category.id);
+    }
+    
+    // التنقل بين الصور في نافذة التكبير
+    function navigateModal(direction) {
+        if (direction === 'prev') {
+            currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : menuCategories.length - 1;
+        } else {
+            currentImageIndex = currentImageIndex < menuCategories.length - 1 ? currentImageIndex + 1 : 0;
+        }
+        
+        const category = menuCategories[currentImageIndex];
+        
+        // تحديث الصورة والمحتوى
+        modalImg.src = category.image;
+        modalImg.alt = category.name;
+        
+        // عرض اسم القائمة فقط
+        let contentHTML = `<strong>${category.name}</strong>`;
+        modalText.innerHTML = contentHTML;
+        
+        // تحديث شريط القوائم
+        updateCategoryButtons(category.id);
+    }
+    
+    // تحديث أزرار القوائم
+    function updateCategoryButtons(categoryId) {
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-category') === categoryId) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
+    // معالجة السحب
+    function handleSwipe() {
+        const swipeThreshold = 50;
+        
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // سحب لليسار - التالي
+            navigateImage('next');
+        } else if (touchEndX > touchStartX + swipeThreshold) {
+            // سحب لليمين - السابق
+            navigateImage('prev');
+        }
+    }
+});
     </script>
 </body>
 </html>
