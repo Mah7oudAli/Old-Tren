@@ -86,8 +86,7 @@
 <!-- Coding by mahmoud Ali Abu Shanab  -->
 
     <script>
-        // بيانات القوائم بدون subtitle و content بالترتيب المطلوب
-        // بيانات القوائم بدون subtitle و content بالترتيب المطلوب
+// بيانات القوائم بدون subtitle و content بالترتيب المطلوب
 const menuCategories = [
     {
         id: "meals",
@@ -155,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentImageIndex = 0;
     let currentActiveIndex = 0;
+    let isScrolling = false;
     
     // إخفاء شاشة البدء
     setTimeout(() => {
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             splashScreen.style.display = 'none';
             // عرض أول صورة بعد إخفاء شاشة البدء
-            showActiveImage();
+            navigateToImage(0);
         }, 500);
     }, 3000);
     
@@ -180,16 +180,35 @@ document.addEventListener('DOMContentLoaded', function() {
     addImageIndicator();
     
     // أحداث السحب
+    let touchStartY = 0;
+    let touchEndY = 0;
     let touchStartX = 0;
     let touchEndX = 0;
     
     menuScroll.addEventListener('touchstart', function(e) {
-        touchStartX = e.changedTouches[0].screenX;
-    });
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    
+    menuScroll.addEventListener('touchmove', function(e) {
+        touchEndY = e.touches[0].clientY;
+        touchEndX = e.touches[0].clientX;
+    }, { passive: true });
     
     menuScroll.addEventListener('touchend', function(e) {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe();
+        const deltaY = touchStartY - touchEndY;
+        const deltaX = touchStartX - touchEndX;
+        
+        // إذا كان السحب عمودي أكثر من أفقي
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            if (deltaY > 50) {
+                // سحب لأعلى - التالي
+                navigateImage('next');
+            } else if (deltaY < -50) {
+                // سحب لأسفل - السابق
+                navigateImage('prev');
+            }
+        }
     });
     
     // إخفاء تلميح السحب بعد 5 ثوان
@@ -241,11 +260,22 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // التنقل بين الصور الرئيسية بالسهمين
         if (!imageModal.classList.contains('active')) {
-            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
                 navigateImage('next');
-            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
                 navigateImage('prev');
             }
+        }
+    });
+    
+    // تحسين تجربة التمرير مع scroll-snap
+    menuScroll.addEventListener('scroll', function() {
+        if (!isScrolling) {
+            isScrolling = true;
+            setTimeout(() => {
+                updateActiveImageFromScroll();
+                isScrolling = false;
+            }, 100);
         }
     });
     
@@ -259,26 +289,50 @@ document.addEventListener('DOMContentLoaded', function() {
             imgContainer.id = category.id;
             imgContainer.setAttribute('data-index', index);
             
-            imgContainer.innerHTML = `
-                <img src="${category.image}" alt="${category.name}" class="menu-img">
-                <div class="menu-img-overlay">
-                    <div>
-                        <div class="menu-title">${category.name}</div>
-                    </div>
-                    <div class="menu-icon">
-                        <i class="fas fa-expand-alt"></i>
-                    </div>
-                </div>
-            `;
+            // إنشاء عنصر الصورة
+            const img = document.createElement('img');
+            img.src = category.image;
+            img.alt = category.name;
+            img.className = 'menu-img';
+            
+            // تحميل الصورة أولاً للحصول على أبعادها
+            img.onload = function() {
+                adjustImageContainer(imgContainer, img);
+            };
+            
+            imgContainer.appendChild(img);
             
             // حدث النقر على الصورة لفتحها بتكبير
-            imgContainer.addEventListener('click', function() {
-                const index = parseInt(this.getAttribute('data-index'));
-                openImageModal(index);
+            imgContainer.addEventListener('click', function(e) {
+                // منع فتح النافذة إذا كان النقر على الأسهم
+                if (!e.target.closest('.nav-arrow')) {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    openImageModal(index);
+                }
             });
             
             menuScroll.appendChild(imgContainer);
         });
+    }
+    
+    // ضبط حاوية الصورة بناءً على أبعاد الصورة
+    function adjustImageContainer(container, img) {
+        const imgRatio = img.naturalHeight / img.naturalWidth;
+        const containerRatio = window.innerHeight / window.innerWidth;
+        
+        if (imgRatio > containerRatio) {
+            // الصورة أطول من الحاوية
+            img.style.objectFit = 'contain';
+            img.style.width = 'auto';
+            img.style.height = '100%';
+            img.style.maxWidth = '100%';
+        } else {
+            // الصورة أوسع من الحاوية
+            img.style.objectFit = 'contain';
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.maxHeight = '100%';
+        }
     }
     
     // إضافة أسهم التنقل
@@ -288,10 +342,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         arrowsContainer.innerHTML = `
             <button class="nav-arrow prev">
-                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-chevron-up"></i>
             </button>
             <button class="nav-arrow next">
-                <i class="fas fa-chevron-left"></i>
+                <i class="fas fa-chevron-down"></i>
             </button>
         `;
         
@@ -330,29 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(indicator);
     }
     
-    // عرض الصورة النشطة
-    function showActiveImage() {
-        // إخفاء جميع الصور
-        document.querySelectorAll('.menu-img-container').forEach(container => {
-            container.classList.remove('active');
-        });
-        
-        // إظهار الصورة النشطة
-        const activeContainer = document.querySelector(`[data-index="${currentActiveIndex}"]`);
-        if (activeContainer) {
-            activeContainer.classList.add('active');
-            
-            // التمرير إلى الصورة
-            activeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        // تحديث زر القائمة النشط
-        updateCategoryButtons(menuCategories[currentActiveIndex].id);
-        
-        // تحديث مؤشر الصور
-        updateImageIndicator();
-    }
-    
     // التنقل بين الصور
     function navigateImage(direction) {
         if (direction === 'prev') {
@@ -361,14 +392,50 @@ document.addEventListener('DOMContentLoaded', function() {
             currentActiveIndex = currentActiveIndex < menuCategories.length - 1 ? currentActiveIndex + 1 : 0;
         }
         
-        showActiveImage();
+        navigateToImage(currentActiveIndex);
     }
     
     // التنقل إلى صورة معينة
     function navigateToImage(index) {
         if (index >= 0 && index < menuCategories.length) {
             currentActiveIndex = index;
-            showActiveImage();
+            
+            const targetElement = document.querySelector(`[data-index="${index}"]`);
+            if (targetElement) {
+                targetElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                
+                // تحديث زر القائمة النشط
+                updateCategoryButtons(menuCategories[index].id);
+                
+                // تحديث مؤشر الصور
+                updateImageIndicator();
+            }
+        }
+    }
+    
+    // تحديث الصورة النشطة بناءً على التمرير
+    function updateActiveImageFromScroll() {
+        const containers = document.querySelectorAll('.menu-img-container');
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+        
+        containers.forEach((container, index) => {
+            const rect = container.getBoundingClientRect();
+            const distance = Math.abs(rect.top);
+            
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
+            }
+        });
+        
+        if (closestIndex !== currentActiveIndex) {
+            currentActiveIndex = closestIndex;
+            updateCategoryButtons(menuCategories[closestIndex].id);
+            updateImageIndicator();
         }
     }
     
@@ -475,19 +542,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // معالجة السحب
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        
-        if (touchEndX < touchStartX - swipeThreshold) {
-            // سحب لليسار - التالي
-            navigateImage('next');
-        } else if (touchEndX > touchStartX + swipeThreshold) {
-            // سحب لليمين - السابق
-            navigateImage('prev');
-        }
-    }
+    // إعادة ضبط الصور عند تغيير حجم النافذة
+    window.addEventListener('resize', function() {
+        document.querySelectorAll('.menu-img-container').forEach(container => {
+            const img = container.querySelector('img');
+            if (img && img.complete) {
+                adjustImageContainer(container, img);
+            }
+        });
+    });
 });
     </script>
 </body>
 </html>
+
