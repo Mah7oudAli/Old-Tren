@@ -86,76 +86,58 @@
 <!-- Coding by mahmoud Ali Abu Shanab  -->
 
     <script>
-        // بيانات القوائم مع محتويات كل قائمة
+        // بيانات القوائم بدون subtitle و content بالترتيب المطلوب
         const menuCategories = [
-            {
-                id: "grills",
-                name: "مشويات",
-                image: "images/grills.jpg",
-                subtitle: "طازجة على الفحم",
-            },
-            {
-                id: "main",
-                name: "الرئيسية",
-                image: "images/index.jpg",
-                subtitle: "أفضل ما نقدمه",
-            },
-            {
-                id: "juices",
-                name: "عصائر",
-                image: "images/drank.jpg",
-                
-            },
-            {
-                id: "icecream",
-                name: "بوظة",
-                image: "images/ice.jpg",
-                subtitle: "بأشهى النكهات",
-            },
             {
                 id: "meals",
                 name: "وجبات",
-                image: "images/food-groub.jpg",
-                subtitle: "شهية ومتنوعة",
+                image: "images/food-groub.jpg"
             },
             {
-                id: "cocktails",
-                name: "كوكتيل",
-                image: "images/cocktails.jpg",
-                subtitle: "مشروبات منعشة",
+                id: "grills",
+                name: "مشويات",
+                image: "images/grills.jpg"
             },
             {
                 id: "sandwiches",
                 name: "سندويشات",
-                image: "images/sandwiches.jpg",
-                subtitle: "لذيذة وسريعة",
-            },
-            {
-                id: "salad",
-                name: "السلطة",
-                image: "images/salat.jpg",
-                subtitle: "طازجة وصحية"
-                
-            },
-            {
-                id: "kingshak",
-                name: "الملك شك",
-                image: "images/kingshak.jpg",
-                subtitle: "حلويات مميزة",
+                image: "images/sandwiches.jpg"
             },
             {
                 id: "appetizers",
-                name: "المقبلات",
-                image: "images/appetizers.jpg",
-                subtitle: "مقبلات لبداية الوجبة",
+                name: "مقبلات",
+                image: "images/appetizers.jpg"
+            },
+            {
+                id: "salad",
+                name: "سلطات",
+                image: "images/salat.jpg"
+            },
+            {
+                id: "icecream",
+                name: "بوظة",
+                image: "images/ice.jpg"
+            },
+            {
+                id: "milkshake",
+                name: "ميلك شيك",
+                image: "images/kingshak.jpg"
+            },
+            {
+                id: "cocktails",
+                name: "كوكتيلات",
+                image: "images/cocktails.jpg"
+            },
+            {
+                id: "juices",
+                name: "عصائر",
+                image: "images/drank.jpg"
             },
             {
                 id: "hotdrinks",
                 name: "مشروبات ساخنة",
-                image: "images/hotdrinks.jpg",
-                subtitle: "تدفئة واسترخاء",
-            },
-            
+                image: "images/hotdrinks.jpg"
+            }
         ];
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -263,7 +245,6 @@
                         <div class="menu-img-overlay">
                             <div>
                                 <div class="menu-title">${category.name}</div>
-                                <div class="menu-subtitle">${category.subtitle}</div>
                             </div>
                             <div class="menu-icon">
                                 <i class="fas fa-expand-alt"></i>
@@ -341,14 +322,8 @@
                 modalImg.src = category.image;
                 modalImg.alt = category.name;
                 
-                // عرض المحتوى النصي (إذا كان موجوداً)
+                // عرض اسم القائمة فقط
                 let contentHTML = `<strong>${category.name}</strong>`;
-                if (category.content && category.content.trim() !== '') {
-                    const formattedContent = category.content.replace(/\n/g, '<br>');
-                    contentHTML += `<br>${formattedContent}`;
-                } else {
-                    contentHTML += `<br>${category.subtitle}`;
-                }
                 modalText.innerHTML = contentHTML;
                 
                 // عرض النافذة
@@ -373,14 +348,8 @@
                 modalImg.src = category.image;
                 modalImg.alt = category.name;
                 
-                // عرض المحتوى النصي (إذا كان موجوداً)
+                // عرض اسم القائمة فقط
                 let contentHTML = `<strong>${category.name}</strong>`;
-                if (category.content && category.content.trim() !== '') {
-                    const formattedContent = category.content.replace(/\n/g, '<br>');
-                    contentHTML += `<br>${formattedContent}`;
-                } else {
-                    contentHTML += `<br>${category.subtitle}`;
-                }
                 modalText.innerHTML = contentHTML;
                 
                 // تحديث شريط القوائم
@@ -450,8 +419,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
-
